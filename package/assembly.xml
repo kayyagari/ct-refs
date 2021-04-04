@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+    <id>package-plugin</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}/to-be-packed</directory>
+            <outputDirectory>${packageName}</outputDirectory>
+            <includes>
+                <include>ct-refs-server-*.jar</include>
+                <include>ct-refs-shared-*.jar</include>
+                <include>ct-refs-client-*.jar</include>
+                <include>plugin.xml</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

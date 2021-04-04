@@ -1,0 +1,23 @@
+<pluginMetaData path="ct-refs">
+    <name>CodeTemplate References Extension</name>
+    <author>Kiran Ayyagari</author>
+    <pluginVersion>${project.version}</pluginVersion>
+    <mirthVersion>${plugin.supported.mc.versions}</mirthVersion>
+    <url>mailto:kayyagari@apache.org</url>
+    <description>Plugin for detecting usages of a CodeTemplate in MirthConnect.</description>
+
+<!--     <serverClasses>
+        <string>com.kayyagari.</string>
+    </serverClasses>
+ -->
+     <clientClasses>
+        <string>com.kayyagari.ctrefs.client.CodeTemplateUsagePlugin</string>
+    </clientClasses>
+ 
+    <library type="SERVER" path="ct-refs-server-${project.version}.jar" />
+    <library type="CLIENT" path="ct-refs-client-${project.version}.jar" />
+    <library type="SHARED" path="ct-refs-shared-${project.version}.jar" />
+
+<!--     <apiProvider type="SERVLET_INTERFACE" name="" />
+    <apiProvider type="SERVER_CLASS" name="" /> -->
+</pluginMetaData>
