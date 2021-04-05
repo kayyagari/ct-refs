@@ -14,5 +14,35 @@
 	<name>CT Refs Shared</name>
 
 	<dependencies>
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>2.0.10</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+        <dependency>
+            <groupId>com.mirth.connect</groupId>
+            <artifactId>mirth-client-core</artifactId>
+            <version>${mc.version}</version>
+        </dependency>
+		<dependency>
+			<groupId>com.mirth.connect</groupId>
+			<artifactId>mirth-server</artifactId>
+			<version>${mc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mirth.connect</groupId>
+			<artifactId>donkey-model</artifactId>
+			<version>${mc.version}</version>
+		</dependency>
 	</dependencies>
 </project>

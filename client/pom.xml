@@ -15,6 +15,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.kayyagari</groupId>
+			<artifactId>ct-refs-shared</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.mirth.connect</groupId>
 			<artifactId>mirth-client</artifactId>
 			<version>${mc.version}</version>
@@ -25,5 +30,29 @@
 			<artifactId>swingx-core</artifactId>
 			<version>1.6.2-2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.miglayout</groupId>
+			<artifactId>miglayout-swing</artifactId>
+			<version>4.2</version>
+			<scope>provided</scope>
+		</dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>1.7.9</version>
+            <scope>provided</scope>
+        </dependency>
 	</dependencies>
 </project>

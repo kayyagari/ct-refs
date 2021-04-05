@@ -2,26 +2,22 @@ package com.kayyagari.ctrefs.client;
 
 import java.lang.reflect.Field;
 
-import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXTaskPane;
 
+import com.kayyagari.ctrefs.shared.CodeTemplateUsageServletInterface;
 import com.mirth.connect.client.ui.codetemplate.CodeTemplatePanel;
 import com.mirth.connect.plugins.ClientPlugin;
 
 public class CodeTemplateUsagePlugin extends ClientPlugin {
 
-	public static final String PLUGIN_NAME = "CT Refs Plugin";
-
-	private static final Logger LOG = Logger.getLogger(CodeTemplateUsagePlugin.class);
-
 	public CodeTemplateUsagePlugin(String name) {
-		super(PLUGIN_NAME);
+		super(CodeTemplateUsageServletInterface.PLUGIN_NAME);
 		System.out.println("initializing plugin " + name);
 	}
 
 	@Override
 	public String getPluginPointName() {
-		return PLUGIN_NAME;
+		return CodeTemplateUsageServletInterface.PLUGIN_NAME;
 	}
 
 	@Override
@@ -38,7 +34,7 @@ public class CodeTemplateUsagePlugin extends ClientPlugin {
 	}
 
 	public void showUsage() {
-		parent.alertInformation(parent, PLUGIN_NAME);
+		parent.alertInformation(parent, CodeTemplateUsageServletInterface.PLUGIN_NAME);
 	}
 
 	@Override

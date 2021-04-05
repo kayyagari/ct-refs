@@ -14,5 +14,10 @@
 	<name>CT Refs Server</name>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.kayyagari</groupId>
+			<artifactId>ct-refs-shared</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>
