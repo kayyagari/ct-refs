@@ -6,10 +6,6 @@
     <url>mailto:kayyagari@apache.org</url>
     <description>Plugin for detecting usages of a CodeTemplate in MirthConnect.</description>
 
-<!--     <serverClasses>
-        <string>com.kayyagari.</string>
-    </serverClasses>
- -->
      <clientClasses>
         <string>com.kayyagari.ctrefs.client.CodeTemplateUsagePlugin</string>
     </clientClasses>
@@ -18,6 +14,7 @@
     <library type="CLIENT" path="ct-refs-client-${project.version}.jar" />
     <library type="SHARED" path="ct-refs-shared-${project.version}.jar" />
 
-<!--     <apiProvider type="SERVLET_INTERFACE" name="" />
-    <apiProvider type="SERVER_CLASS" name="" /> -->
+    <apiProvider type="SERVLET_INTERFACE" name="com.kayyagari.ctrefs.shared.CodeTemplateUsageServletInterface" />
+
+    <apiProvider type="SERVER_CLASS" name="com.kayyagari.ctrefs.server.CodeTemplateUsageServlet" />
 </pluginMetaData>

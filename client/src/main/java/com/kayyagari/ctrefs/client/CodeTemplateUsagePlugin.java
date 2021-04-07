@@ -2,6 +2,9 @@ package com.kayyagari.ctrefs.client;
 
 import java.lang.reflect.Field;
 
+import javax.swing.JDialog;
+import javax.swing.SwingUtilities;
+
 import org.jdesktop.swingx.JXTaskPane;
 
 import com.kayyagari.ctrefs.shared.CodeTemplateUsageServletInterface;
@@ -34,7 +37,25 @@ public class CodeTemplateUsagePlugin extends ClientPlugin {
 	}
 
 	public void showUsage() {
-		parent.alertInformation(parent, CodeTemplateUsageServletInterface.PLUGIN_NAME);
+		//parent.alertInformation(parent, CodeTemplateUsageServletInterface.PLUGIN_NAME);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					CodeTemplateUsagePanel panel = new CodeTemplateUsagePanel();
+					panel.search();
+					JDialog dl = new JDialog(parent);
+					dl.setTitle("CodeTemplate Usage Search");
+					dl.setBounds(parent.getBounds());
+					dl.getContentPane().add(panel);
+					dl.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dl.setVisible(true);
+				}
+				catch(Exception e) {
+					parent.alertThrowable(parent, e);
+				}
+			}
+		});
 	}
 
 	@Override

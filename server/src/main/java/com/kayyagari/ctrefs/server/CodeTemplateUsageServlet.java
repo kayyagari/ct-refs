@@ -8,7 +8,9 @@ import javax.ws.rs.core.SecurityContext;
 
 import com.kayyagari.ctrefs.shared.CodeTemplateUsageServletInterface;
 import com.mirth.connect.client.core.ClientException;
+import com.mirth.connect.client.core.ControllerException;
 import com.mirth.connect.model.Channel;
+import com.mirth.connect.model.ChannelSummary;
 import com.mirth.connect.server.api.MirthServlet;
 
 /**
@@ -25,12 +27,22 @@ public class CodeTemplateUsageServlet extends MirthServlet implements CodeTempla
     }
 
 	@Override
-	public List<Channel> findUsageOfCodeTemplate(String ctId) throws ClientException {
-		return finder.findUsagesOfCodeTemplate(ctId);
+	public List<ChannelSummary> findUsageOfCodeTemplate(String ctId) throws ClientException {
+		try {
+			return finder.findUsagesOfCodeTemplate(ctId);
+		}
+		catch(ControllerException e) {
+			throw new ClientException(e);
+		}
 	}
 
 	@Override
-	public List<Channel> findUsageOfCodeTemplateLib(String ctLibId) throws ClientException {
-		return finder.findUsagesOfCodeTemplateLib(ctLibId);
+	public List<ChannelSummary> findUsageOfCodeTemplateLib(String ctLibId) throws ClientException {
+		try {
+			return finder.findUsagesOfCodeTemplateLib(ctLibId);
+		}
+		catch(ControllerException e) {
+			throw new ClientException(e);
+		}
 	}
 }

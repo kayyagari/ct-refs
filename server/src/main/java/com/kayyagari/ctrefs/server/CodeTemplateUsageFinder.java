@@ -1,10 +1,14 @@
 package com.kayyagari.ctrefs.server;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.mirth.connect.client.core.ControllerException;
 import com.mirth.connect.model.Channel;
+import com.mirth.connect.model.ChannelHeader;
+import com.mirth.connect.model.ChannelSummary;
 import com.mirth.connect.model.codetemplates.CodeTemplate;
 import com.mirth.connect.model.codetemplates.CodeTemplateLibrary;
 import com.mirth.connect.server.controllers.ChannelController;
@@ -24,41 +28,34 @@ public class CodeTemplateUsageFinder {
 		ctController = ControllerFactory.getFactory().createCodeTemplateController();
 	}
 
-	public List<Channel> findUsagesOfCodeTemplate(String ctId) {
+	public List<ChannelSummary> findUsagesOfCodeTemplate(String ctId) throws ControllerException {
 		return findUsagesOf(ctId, false);
 	}
 
-	public List<Channel> findUsagesOfCodeTemplateLib(String ctLibId) {
+	public List<ChannelSummary> findUsagesOfCodeTemplateLib(String ctLibId) throws ControllerException {
 		return findUsagesOf(ctLibId, true);
 	}
 
-	private List<Channel> findUsagesOf(String id, boolean lib) {
-		List<Channel> includedIn = new ArrayList<>();
-		Set<String> cids = chController.getChannelIds();
-		List<Channel> channels = chController.getChannels(cids);
-		for(Channel ch : channels) {
-			List<CodeTemplateLibrary> ctLibs = ch.getExportData().getCodeTemplateLibraries();
-			if(ctLibs != null) {
-			outer:
-				for(CodeTemplateLibrary ctl : ctLibs) {
-					if(lib) {
-						if(id.equals(ctl.getId())) {
-							includedIn.add(ch);
-							break;
-						}
-					}
-					else {
-						for(CodeTemplate ct : ctl.getCodeTemplates()) {
-							if(id.equals(ct.getId())) {
-								includedIn.add(ch);
-								break outer;
-							}
-						}
-					}
-				}
-			}
-		}
+	private List<ChannelSummary> findUsagesOf(String id, boolean lib) throws ControllerException {
+		Map<String, ChannelHeader> includedIn = new HashMap<>();
+		//Set<String> cids = chController.getChannelIds();
+		//List<Channel> channels = chController.getChannels(cids);
+		ChannelHeader header = new ChannelHeader(0, null, false);
 		
-		return includedIn;
+        List<CodeTemplateLibrary> codeTemplateLibraries = ctController.getLibraries(null, true);
+
+        for(CodeTemplateLibrary ctl : codeTemplateLibraries) {
+        	if(id.equals(ctl.getId())) {
+        		Set<String> chIds = ctl.getEnabledChannelIds();
+        		if(chIds != null) {
+        			chIds.stream().forEach(i -> {
+        				includedIn.put(i, header);
+        			});
+        		}
+        		break;
+        	}
+        }
+
+		return chController.getChannelSummary(includedIn, true);
 	}
 }

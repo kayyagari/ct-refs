@@ -12,6 +12,8 @@ import static com.mirth.connect.client.ui.ChannelPanel.STATUS_COLUMN_NAME;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -28,24 +30,37 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableNode;
 
+import com.kayyagari.ctrefs.shared.CodeTemplateUsageServletInterface;
+import com.mirth.connect.client.core.ClientException;
+import com.mirth.connect.client.ui.AbstractChannelTableNode;
+import com.mirth.connect.client.ui.ChannelGroupStatus;
 import com.mirth.connect.client.ui.ChannelTableColumnFactory;
+import com.mirth.connect.client.ui.ChannelTableNode;
+import com.mirth.connect.client.ui.ChannelTableNodeFactory;
 import com.mirth.connect.client.ui.ChannelTreeTableModel;
 import com.mirth.connect.client.ui.Frame;
 import com.mirth.connect.client.ui.Mirth;
 import com.mirth.connect.client.ui.PlatformUI;
 import com.mirth.connect.client.ui.UIConstants;
 import com.mirth.connect.client.ui.codetemplate.CodeTemplateLibraryTreeTableNode;
+import com.mirth.connect.client.ui.codetemplate.CodeTemplatePanel;
 import com.mirth.connect.client.ui.codetemplate.CodeTemplateRootTreeTableNode;
 import com.mirth.connect.client.ui.codetemplate.CodeTemplateTableColumnFactory;
 import com.mirth.connect.client.ui.codetemplate.CodeTemplateTreeTableModel;
 import com.mirth.connect.client.ui.codetemplate.CodeTemplateTreeTableNode;
 import com.mirth.connect.client.ui.components.MirthTreeTable;
+import com.mirth.connect.model.Channel;
+import com.mirth.connect.model.ChannelGroup;
+import com.mirth.connect.model.ChannelStatus;
+import com.mirth.connect.model.ChannelSummary;
 import com.mirth.connect.model.codetemplates.BasicCodeTemplateProperties;
 import com.mirth.connect.model.codetemplates.CodeTemplate;
 import com.mirth.connect.model.codetemplates.CodeTemplateLibrary;
@@ -60,9 +75,11 @@ public class CodeTemplateUsagePanel extends JPanel {
     private MirthTreeTable channelTable;
     private JScrollPane templateTreeTableScrollPane;
     private JScrollPane channelScrollPane;
+    private CodeTemplateUsageServletInterface ctUsageServlet;
 
     public CodeTemplateUsagePanel() {
     	initComponents();
+    	ctUsageServlet = PlatformUI.MIRTH_FRAME.mirthClient.getServlet(CodeTemplateUsageServletInterface.class);
 	}
 
     public void search() throws Exception {
@@ -87,6 +104,38 @@ public class CodeTemplateUsagePanel extends JPanel {
         }
         model.setRoot(root);
         model.sort();
+    }
+
+    private void fetchUsageInfo() {
+    	System.out.println("fetching usage info");
+        int selectedRow = templateTreeTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            TreePath selectedPath = templateTreeTable.getPathForRow(selectedRow);
+            if (selectedPath != null) {
+            	TreeTableNode selectedNode = (TreeTableNode) selectedPath.getLastPathComponent();
+        		if (selectedNode instanceof CodeTemplateTreeTableNode) {
+        			selectedNode = selectedNode.getParent();
+        		}
+            	String id = (String) selectedNode.getValueAt(CodeTemplatePanel.TEMPLATE_ID_COLUMN);
+
+            	try {
+            		List<ChannelSummary> lst = ctUsageServlet.findUsageOfCodeTemplateLib(id);
+            		
+                	List<ChannelStatus> channelStatusLst = new ArrayList<>();
+                	for(ChannelSummary cs : lst) {
+                		channelStatusLst.add(cs.getChannelStatus());
+                	}
+                	ChannelGroup cg = new ChannelGroup();
+                	ChannelGroupStatus cgs = new ChannelGroupStatus(cg, channelStatusLst);
+                	ChannelTreeTableModel model = (ChannelTreeTableModel) channelTable.getTreeTableModel();
+
+                	model.update(Collections.singletonList(cgs));
+            	}
+            	catch(ClientException e) {
+            		PlatformUI.MIRTH_FRAME.alertThrowable(this, e);
+            	}
+            }
+        }
     }
 
     private void initComponents() {
@@ -136,6 +185,17 @@ public class CodeTemplateUsagePanel extends JPanel {
         
         templateTreeTableScrollPane = new JScrollPane(templateTreeTable);
         templateTreeTableScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(0x6E6E6E)));
+        
+        templateTreeTable.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() > 1) {
+					fetchUsageInfo();
+				}
+			}
+        	
+		});
 
         // Channel table
         List<String> columns = Arrays.asList(new String[] { STATUS_COLUMN_NAME,
@@ -149,6 +209,18 @@ public class CodeTemplateUsagePanel extends JPanel {
 
         ChannelTreeTableModel channelTreeModel = new ChannelTreeTableModel();
         channelTreeModel.setColumnIdentifiers(columns);
+        channelTreeModel.setGroupModeEnabled(false);
+        channelTreeModel.setNodeFactory(new ChannelTableNodeFactory() {
+        	@Override
+        	public AbstractChannelTableNode createNode(ChannelGroupStatus groupStatus) {
+        		return new ChannelTableNode(groupStatus);
+        	}
+        	
+        	@Override
+        	public AbstractChannelTableNode createNode(ChannelStatus channelStatus) {
+        		return new ChannelTableNode(channelStatus);
+        	}
+        });
         channelTable.setTreeTableModel(channelTreeModel);
 
         channelTable.setDoubleBuffered(true);
@@ -208,12 +280,35 @@ public class CodeTemplateUsagePanel extends JPanel {
     	return ct;
     }
 
+    private void addTestChannel() {
+    	ChannelGroup cg = new ChannelGroup();
+    	List<ChannelStatus> lst = new ArrayList<>();
+    	ChannelStatus cs = new ChannelStatus();
+    	Channel ch = new Channel(UUID.randomUUID().toString());
+    	ch.setDescription("test channel");
+    	ch.setName("test channel");
+    	ch.setNextMetaDataId(1);
+    	ch.setRevision(1);
+    	
+    	cs.setChannel(ch);
+    	cs.setCodeTemplatesChanged(false);
+    	cs.setDeployedDate(Calendar.getInstance());
+    	cs.setDeployedRevisionDelta(1);
+    	//cs.setLocalChannelId(ch.g);
+    	lst.add(cs);
+    	ChannelGroupStatus cgs = new ChannelGroupStatus(cg, lst);
+    	ChannelTreeTableModel model = (ChannelTreeTableModel) channelTable.getTreeTableModel();
+
+    	model.update(Collections.singletonList(cgs));
+    }
+
     public static void main(String[] args) {
 		JFrame frame = new JFrame("CodeTemplate Usage");
 		frame.setBounds(100, 100, 400, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		CodeTemplateUsagePanel panel = new CodeTemplateUsagePanel();
 		panel.addTestCodeTemplates();
+		panel.addTestChannel();
 		frame.getContentPane().setLayout(new FlowLayout());
 		frame.getContentPane().add(panel);
 		//frame.pack();
