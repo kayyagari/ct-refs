@@ -1,5 +1,7 @@
 package com.kayyagari.ctrefs.client;
 
+import java.awt.Rectangle;
+
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
@@ -8,6 +10,8 @@ import org.jdesktop.swingx.JXTaskPane;
 
 import com.kayyagari.ctrefs.shared.CodeTemplateUsageServletInterface;
 import com.mirth.connect.plugins.ClientPlugin;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * 
@@ -48,10 +52,13 @@ public class CodeTemplateUsagePlugin extends ClientPlugin {
 				try {
 					CodeTemplateUsagePanel panel = new CodeTemplateUsagePanel();
 					panel.search();
-					JDialog dl = new JDialog(parent);
+					JDialog dl = new JDialog(parent, false);
 					dl.setTitle("CodeTemplate Usage Search");
-					dl.setBounds(parent.getBounds());
+					Rectangle r = parent.getBounds();
+					dl.setBounds(r.x + 150, r.y, r.width, r.height);
+					dl.getContentPane().setLayout(new MigLayout("insets 8, novisualpadding, hidemode 3, fill"));
 					dl.getContentPane().add(panel);
+					dl.pack();
 					dl.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dl.setVisible(true);
 				}

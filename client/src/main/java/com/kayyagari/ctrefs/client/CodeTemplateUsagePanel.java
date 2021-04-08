@@ -103,6 +103,7 @@ public class CodeTemplateUsagePanel extends JPanel {
             root.add(libraryNode);
         }
         model.setRoot(root);
+        templateTreeTable.expandAll();
         model.sort();
     }
 
