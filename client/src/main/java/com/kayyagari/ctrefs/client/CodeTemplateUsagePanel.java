@@ -113,13 +113,16 @@ public class CodeTemplateUsagePanel extends JPanel {
             TreePath selectedPath = templateTreeTable.getPathForRow(selectedRow);
             if (selectedPath != null) {
             	TreeTableNode selectedNode = (TreeTableNode) selectedPath.getLastPathComponent();
-        		if (selectedNode instanceof CodeTemplateTreeTableNode) {
-        			selectedNode = selectedNode.getParent();
-        		}
             	String id = (String) selectedNode.getValueAt(CodeTemplatePanel.TEMPLATE_ID_COLUMN);
 
             	try {
-            		List<ChannelSummary> lst = ctUsageServlet.findUsageOfCodeTemplateLib(id);
+            		List<ChannelSummary> lst = null;
+            		if (selectedNode instanceof CodeTemplateTreeTableNode) {
+            			lst = ctUsageServlet.findUsageOfCodeTemplate(id);
+            		}
+            		else {
+            			lst = ctUsageServlet.findUsageOfCodeTemplateLib(id);
+            		}
             		
                 	List<ChannelStatus> channelStatusLst = new ArrayList<>();
                 	for(ChannelSummary cs : lst) {

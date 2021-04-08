@@ -1,16 +1,18 @@
 package com.kayyagari.ctrefs.client;
 
-import java.lang.reflect.Field;
-
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXTaskPane;
 
 import com.kayyagari.ctrefs.shared.CodeTemplateUsageServletInterface;
-import com.mirth.connect.client.ui.codetemplate.CodeTemplatePanel;
 import com.mirth.connect.plugins.ClientPlugin;
 
+/**
+ * 
+ * @author Kiran Ayyagari (kayyagari@apache.org)
+ */
 public class CodeTemplateUsagePlugin extends ClientPlugin {
 
 	public CodeTemplateUsagePlugin(String name) {
@@ -30,14 +32,16 @@ public class CodeTemplateUsagePlugin extends ClientPlugin {
 	@Override
 	public void start() {
 		System.out.println("starting CodeTemplateUsagePlugin...");
-		CodeTemplatePanel ctPanel = parent.codeTemplatePanel;
-		JXTaskPane codeTemplateTasks = getTaskPane();
-		int index = parent.addTask("showUsage", "Show Usage", "tool tip", "", null, codeTemplateTasks, null, this);
+
+        ClassLoader cl = getClass().getClassLoader();
+        ImageIcon icon = new ImageIcon(cl.getResource("zoom.png"));
+
+        JXTaskPane channelTasks = parent.channelPanel.channelTasks;
+		parent.addTask("searchCode", "Search Code", "Search CodeTemplate References in Channels", "s", icon, channelTasks, null, this);
 		System.out.println("added task");
 	}
 
-	public void showUsage() {
-		//parent.alertInformation(parent, CodeTemplateUsageServletInterface.PLUGIN_NAME);
+	public void searchCode() {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -60,17 +64,5 @@ public class CodeTemplateUsagePlugin extends ClientPlugin {
 
 	@Override
 	public void stop() {
-	}
-
-	private JXTaskPane getTaskPane() {
-		try {
-			Field f = CodeTemplatePanel.class.getDeclaredField("codeTemplateTasks");
-			f.setAccessible(true);
-			return (JXTaskPane) f.get(parent.codeTemplatePanel);
-		}
-		catch(Exception e) {
-			System.out.println(e.getMessage());
-			throw new RuntimeException(e);
-		}
 	}
 }

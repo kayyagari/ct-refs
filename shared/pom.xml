@@ -44,5 +44,10 @@
 			<artifactId>donkey-model</artifactId>
 			<version>${mc.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>1.7.9</version>
+        </dependency>
 	</dependencies>
 </project>
