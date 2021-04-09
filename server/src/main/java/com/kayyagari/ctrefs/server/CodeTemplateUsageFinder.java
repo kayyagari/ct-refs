@@ -91,6 +91,7 @@ public class CodeTemplateUsageFinder {
         	}
         }
 
-		return chController.getChannelSummary(includedIn, true);
+        List<ChannelSummary> lst = chController.getChannelSummary(includedIn, true);
+		return lst;
 	}
 }
