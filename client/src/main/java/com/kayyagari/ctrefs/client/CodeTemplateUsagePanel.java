@@ -84,7 +84,6 @@ public class CodeTemplateUsagePanel extends JPanel {
     public void search() throws Exception {
     	Frame parent = PlatformUI.MIRTH_FRAME;
     	String selectedId = parent.codeTemplatePanel.getCurrentSelectedId();
-    	System.out.println("selected CT/CTLib id " + selectedId);
     	
     	List<CodeTemplateLibrary> lst = parent.mirthClient.getAllCodeTemplateLibraries(true);
     	addCodeTemplates(lst);
@@ -107,7 +106,6 @@ public class CodeTemplateUsagePanel extends JPanel {
     }
 
     private void fetchUsageInfo() {
-    	System.out.println("fetching usage info");
         int selectedRow = templateTreeTable.getSelectedRow();
         if (selectedRow >= 0) {
             TreePath selectedPath = templateTreeTable.getPathForRow(selectedRow);

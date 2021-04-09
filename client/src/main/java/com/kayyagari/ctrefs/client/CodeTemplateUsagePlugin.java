@@ -26,7 +26,6 @@ public class CodeTemplateUsagePlugin extends ClientPlugin {
 	private JFrame ctSearchFrame;
 	public CodeTemplateUsagePlugin(String name) {
 		super(CodeTemplateUsageServletInterface.PLUGIN_NAME);
-		System.out.println("initializing plugin " + name);
 	}
 
 	@Override
@@ -40,14 +39,11 @@ public class CodeTemplateUsagePlugin extends ClientPlugin {
 
 	@Override
 	public void start() {
-		System.out.println("starting CodeTemplateUsagePlugin...");
-
         ClassLoader cl = getClass().getClassLoader();
         ImageIcon icon = new ImageIcon(cl.getResource("zoom.png"));
 
         JXTaskPane channelTasks = parent.channelPanel.channelTasks;
 		parent.addTask("searchCode", "Search Code", "Search CodeTemplate References in Channels", "s", icon, channelTasks, null, this);
-		System.out.println("added task");
 	}
 
 	public void searchCode() {
