@@ -1,14 +1,18 @@
 package com.kayyagari.ctrefs.client;
 
 import java.awt.Rectangle;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXTaskPane;
 
 import com.kayyagari.ctrefs.shared.CodeTemplateUsageServletInterface;
+import com.mirth.connect.client.ui.UIConstants;
 import com.mirth.connect.plugins.ClientPlugin;
 
 import net.miginfocom.swing.MigLayout;
@@ -19,6 +23,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public class CodeTemplateUsagePlugin extends ClientPlugin {
 
+	private JFrame ctSearchFrame;
 	public CodeTemplateUsagePlugin(String name) {
 		super(CodeTemplateUsageServletInterface.PLUGIN_NAME);
 		System.out.println("initializing plugin " + name);
@@ -46,21 +51,31 @@ public class CodeTemplateUsagePlugin extends ClientPlugin {
 	}
 
 	public void searchCode() {
+		if(ctSearchFrame != null) {
+			ctSearchFrame.requestFocus();
+			return;
+		}
+
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				try {
+					ctSearchFrame = new JFrame();
+					ctSearchFrame.setTitle("CodeTemplate Usage Search");
+					ctSearchFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					ctSearchFrame.addWindowListener(new WindowAdapter() {
+						@Override
+						public void windowClosed(WindowEvent e) {
+							ctSearchFrame = null;
+						}
+					});
 					CodeTemplateUsagePanel panel = new CodeTemplateUsagePanel();
 					panel.search();
-					JDialog dl = new JDialog(parent, false);
-					dl.setTitle("CodeTemplate Usage Search");
 					Rectangle r = parent.getBounds();
-					dl.setBounds(r.x + 150, r.y, r.width, r.height);
-					dl.getContentPane().setLayout(new MigLayout("insets 8, novisualpadding, hidemode 3, fill"));
-					dl.getContentPane().add(panel);
-					dl.pack();
-					dl.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-					dl.setVisible(true);
+					ctSearchFrame.getContentPane().setLayout(new MigLayout("insets 2, novisualpadding, hidemode 3, fill"));
+					ctSearchFrame.getContentPane().add(panel, "growx");
+					ctSearchFrame.setBounds(r.x + 150, r.y + 100, r.width - 200, r.height - 200);
+					ctSearchFrame.setVisible(true);
 				}
 				catch(Exception e) {
 					parent.alertThrowable(parent, e);

@@ -10,8 +10,8 @@ import static com.mirth.connect.client.ui.ChannelPanel.LOCAL_CHANNEL_ID;
 import static com.mirth.connect.client.ui.ChannelPanel.NAME_COLUMN_NAME;
 import static com.mirth.connect.client.ui.ChannelPanel.STATUS_COLUMN_NAME;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -34,7 +35,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 
@@ -57,7 +57,6 @@ import com.mirth.connect.client.ui.codetemplate.CodeTemplateTableColumnFactory;
 import com.mirth.connect.client.ui.codetemplate.CodeTemplateTreeTableModel;
 import com.mirth.connect.client.ui.codetemplate.CodeTemplateTreeTableNode;
 import com.mirth.connect.client.ui.components.MirthTreeTable;
-import com.mirth.connect.model.Channel;
 import com.mirth.connect.model.ChannelGroup;
 import com.mirth.connect.model.ChannelStatus;
 import com.mirth.connect.model.ChannelSummary;
@@ -143,14 +142,14 @@ public class CodeTemplateUsagePanel extends JPanel {
     }
 
     private void initComponents() {
-    	setLayout(new MigLayout("insets 8, novisualpadding, hidemode 3, fill"));
+    	setLayout(new MigLayout("insets 1, novisualpadding, hidemode 3, fill"));
         setBackground(UIConstants.BACKGROUND_COLOR);
         splitPane = new JSplitPane();
         splitPane.setBackground(getBackground());
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         splitPane.setBorder(BorderFactory.createEmptyBorder());
         splitPane.setOneTouchExpandable(true);
-        splitPane.setDividerLocation(Preferences.userNodeForPackage(Mirth.class).getInt("height", UIConstants.MIRTH_HEIGHT) / 3);
+        splitPane.setDividerLocation(0.5);
         splitPane.setResizeWeight(0.5);
 
         templateTreeTable = new MirthTreeTable("CodeTemplate", new HashSet<String>(Arrays.asList(new String[] {"Name", "Description", "Revision", "Last Modified" })));
@@ -189,6 +188,7 @@ public class CodeTemplateUsagePanel extends JPanel {
         
         templateTreeTableScrollPane = new JScrollPane(templateTreeTable);
         templateTreeTableScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(0x6E6E6E)));
+
         
         templateTreeTable.addMouseListener(new MouseAdapter() {
 
@@ -250,10 +250,17 @@ public class CodeTemplateUsagePanel extends JPanel {
         channelScrollPane = new JScrollPane(channelTable);
         channelScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         
-        splitPane.setTopComponent(templateTreeTableScrollPane);
-        splitPane.setBottomComponent(channelScrollPane);
+        JPanel topPanel = new JPanel(new MigLayout("insets 1, novisualpadding, fill"));
+        topPanel.add(new JLabel("Code Templates"), "wrap");
+        topPanel.add(templateTreeTableScrollPane, "width 100%");
+        splitPane.setTopComponent(topPanel);
+
+        JPanel bottomPanel = new JPanel(new MigLayout("insets 1, novisualpadding, fill"));
+        bottomPanel.add(new JLabel("Dependent Channels"), "wrap");
+        bottomPanel.add(channelScrollPane, "width 100%");
+        splitPane.setBottomComponent(bottomPanel);
         
-        add(splitPane);
+        add(splitPane, "growx");
     }
     
     private void addTestCodeTemplates() {
@@ -284,38 +291,14 @@ public class CodeTemplateUsagePanel extends JPanel {
     	return ct;
     }
 
-    private void addTestChannel() {
-    	ChannelGroup cg = new ChannelGroup();
-    	List<ChannelStatus> lst = new ArrayList<>();
-    	ChannelStatus cs = new ChannelStatus();
-    	Channel ch = new Channel(UUID.randomUUID().toString());
-    	ch.setDescription("test channel");
-    	ch.setName("test channel");
-    	ch.setNextMetaDataId(1);
-    	ch.setRevision(1);
-    	
-    	cs.setChannel(ch);
-    	cs.setCodeTemplatesChanged(false);
-    	cs.setDeployedDate(Calendar.getInstance());
-    	cs.setDeployedRevisionDelta(1);
-    	//cs.setLocalChannelId(ch.g);
-    	lst.add(cs);
-    	ChannelGroupStatus cgs = new ChannelGroupStatus(cg, lst);
-    	ChannelTreeTableModel model = (ChannelTreeTableModel) channelTable.getTreeTableModel();
-
-    	model.update(Collections.singletonList(cgs));
-    }
-
     public static void main(String[] args) {
 		JFrame frame = new JFrame("CodeTemplate Usage");
-		frame.setBounds(100, 100, 400, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		CodeTemplateUsagePanel panel = new CodeTemplateUsagePanel();
 		panel.addTestCodeTemplates();
-		panel.addTestChannel();
-		frame.getContentPane().setLayout(new FlowLayout());
-		frame.getContentPane().add(panel);
-		//frame.pack();
+		frame.getContentPane().setLayout(new MigLayout("insets 2, novisualpadding, hidemode 3, fill"));
+		frame.getContentPane().add(panel, "grow");
+		frame.setBounds(100, 100, 1100, 600);
 		frame.setVisible(true);
 	}
 }
